@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.7
 
+# /dev/disk/by-id/usb-Garmin_Edge_800_Flash_0000e52fb239-0:0
+
 # upload-gpx-tracks.py - upload latest GPX tracks from a Garmin device
 # to Strava http://strava.com using Strava API
 # It is meant to be automatically run on each USB storage device attachment.
@@ -35,7 +37,7 @@ from subprocess import call as call
 
 # Original stravaup.py imports
 from stravalib import Client, exc
-from sys import stderr, stdin
+from sys import stderr, stdin, exit
 from tempfile import NamedTemporaryFile
 import webbrowser, os.path, ConfigParser, gzip
 import argparse
@@ -105,7 +107,7 @@ def upload_activities(activities):
         print("Uploading activity from {}...".format(f))
 
         title = None
-        desc = "GPX trace automatically detected by upload-gpx-tracks.py"
+        desc = "Uploaded automatically using https://github.com/hozn/stravalib"
 
         # Upload compresed activity
         try:
@@ -113,7 +115,7 @@ def upload_activities(activities):
             upstat = client.upload_activity(cf, ext[1:] + '.gz',
                                             title,
                                             desc,
-                                            private=False)
+                                            private=True)
                                             # TODO detect activity_type somehow?
             activity = upstat.wait()
             duplicate = False
@@ -168,7 +170,8 @@ if not os.environ.has_key("DBUS_SESSION_BUS_ADDRESS"):
 sysbus = dbus.SystemBus()
 bus = dbus.SessionBus()
 
-try: devname = sys.argv[1]
+devname = '/dev/null'
+try: mountpoint = sys.argv[1]
 except: usage()
 
 print("Started: " + datetime.datetime.today().strftime("%s") + " " + devname)
@@ -186,12 +189,12 @@ unmount = udisk.get_dbus_method("FilesystemUnmount",
 
 # The line below tests notification mechanism before doing any mounting.
 # If we fail here, at least the device will not be touched.
-popup("Mounting %s" % (devname))
-try: mountpoint = mount("", # fstype
-                        dbus.Array([], signature="s")) # options
-except:
-    popup("Failed to mount %s" % devname)
-    raise
+#popup("Mounting %s" % (devname))
+#try: mountpoint = mount("", # fstype
+#                        dbus.Array([], signature="s")) # options
+#except:
+#    popup("Failed to mount %s" % devname)
+#    raise
 
 # Get a list of all new GPX files since last sync time
 cp = ConfigParser.ConfigParser()
@@ -201,12 +204,12 @@ if cp.has_section('UPLOAD') and 'last_time' in cp.options('UPLOAD'):
 else: last_time = 0
 
 # Root directory where GPX files are placed on Garmin devices
-gpx_root = mountpoint + "/Garmin/GPX/"
+gpx_root = mountpoint + "/Garmin/Activities/"
 
 upload_list = []
 for dirpath, dirnames, filenames in os.walk(gpx_root):
     for fname in filenames:
-        if os.path.splitext(fname)[1].lower() == ".gpx":
+        if os.path.splitext(fname)[1].lower() == ".fit":
             fname = os.path.join(dirpath, fname)
             fstats = os.stat(fname)
             mtime = fstats.st_mtime
@@ -224,7 +227,7 @@ print ("List of GPX to upload: ", upload_list)
 # Upload new GPX files
 result = upload_activities(upload_list)
 if not result:
-    popup("One of more GPX files failed to upload")
+    popup("One or more GPX files failed to upload")
 else:
     # Record the last sync time to prevent submission of duplicates next time
     last_time = datetime.datetime.today().strftime("%s")
@@ -234,11 +237,11 @@ else:
     cp.write(open(os.path.expanduser(configfilename),"w"))
 
 # Unmount the device
-try:
-    call(['sync']) # Wait for FS to become ready
-    unmount(dbus.Array(["force"], signature="s"))
-    popup("%s is unmounted" % mountpoint)
-except:
-    popup("Failed to unmount the file system, it is probably busy")
-    raise
+#try:
+    #call(['sync']) # Wait for FS to become ready
+    #unmount(dbus.Array(["force"], signature="s"))
+    #popup("%s is unmounted" % mountpoint)
+#except:
+    #popup("Failed to unmount the file system, it is probably busy")
+    #raise
 exit(0)
