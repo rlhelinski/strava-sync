@@ -152,7 +152,7 @@ def detect_sesion_bus():
     
 ### Configuration
 configfilename = '~/.stravacli'
-size_threshold = 4*1024
+size_threshold = 1*1024
 
 ### Main code
 
