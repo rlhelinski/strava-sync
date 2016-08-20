@@ -228,6 +228,8 @@ print ("List of GPX to upload: ", upload_list)
 result = upload_activities(upload_list)
 if not result:
     popup("One or more GPX files failed to upload")
+elif not upload_list:
+    popup("No new activities uploaded")
 else:
     # Record the last sync time to prevent submission of duplicates next time
     last_time = datetime.datetime.today().strftime("%s")
