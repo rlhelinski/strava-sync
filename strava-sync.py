@@ -25,7 +25,7 @@
 # https://github.com/dlenski/stravacli#application-authorization, and shares it
 # with stravacli ($HOME/.stravacli)
 
-# Other dependedncies:
+# Other dependencies:
 # - stravalib from https://github.com/hozn/stravalib
 # - Dbus bindings for desktop notifications, device mounting etc.
 from __future__ import print_function
@@ -48,12 +48,13 @@ try:
 except ImportError:
     import xml.etree.ElementTree as etree
 
-import dbus
-import gobject
-from dbus.mainloop.glib import DBusGMainLoop
+#import dbus
+#import gobject
+#from dbus.mainloop.glib import DBusGMainLoop
 
 def popup(msg):
     print (msg)
+    return
     notify = bus.get_object('org.freedesktop.Notifications',
                             '/org/freedesktop/Notifications')
     method = notify.get_dbus_method('Notify', 'org.freedesktop.Notifications')
@@ -107,9 +108,9 @@ def upload_activities(activities):
         print("Uploading activity from {}...".format(f))
 
         title = None
-        desc = "Uploaded automatically using https://github.com/hozn/stravalib"
+        desc = "Uploaded automatically using https://github.com/rlhelinski/strava-sync"
 
-        # Upload compresed activity
+        # Upload compressed activity
         try:
             cf.seek(0, 0)
             upstat = client.upload_activity(cf, ext[1:] + '.gz',
@@ -138,6 +139,7 @@ def upload_activities(activities):
 def detect_sesion_bus():
     # Look for a file inside .dbus/session-bus/ directory
     # and extract DBUS_SESSION_BUS_ADDRESS from its contents.
+    return
     topfolder = os.path.expanduser("~/.dbus/session-bus")
     for dirpath, dirs, fnames in os.walk(topfolder):
         for fname in fnames:
@@ -158,17 +160,17 @@ size_threshold = 1*1024
 
 # The script is often started from a headless environment, unaware of any
 # X11 or DBus. While X11 is used only to show nice notifications,
-# the DBus dependedncy is essential as it does privileged mounting operations.
+# the DBus dependency is essential as it does privileged mounting operations.
 # For things to work, a session bus has to be known, system bus cannot be
 # used instead.
-# TODO Make the script work even in absense of X display.
+# TODO Make the script work even in absence of X display.
 if not os.environ.has_key("DISPLAY"):
     os.environ['DISPLAY'] = ":0"
 if not os.environ.has_key("DBUS_SESSION_BUS_ADDRESS"):
     os.environ['DBUS_SESSION_BUS_ADDRESS'] = detect_sesion_bus()
 
-sysbus = dbus.SystemBus()
-bus = dbus.SessionBus()
+#sysbus = dbus.SystemBus()
+#bus = dbus.SessionBus()
 
 devname = '/dev/null'
 try: mountpoint = sys.argv[1]
@@ -180,12 +182,12 @@ print("Started: " + datetime.datetime.today().strftime("%s") + " " + devname)
 devname = devname.split("/")[-1]
 
 # Mount the device
-udisk = sysbus.get_object("org.freedesktop.UDisks",
-                          "/org/freedesktop/UDisks/devices/%s" % devname)
-mount = udisk.get_dbus_method("FilesystemMount",
-                              dbus_interface="org.freedesktop.UDisks.Device")
-unmount = udisk.get_dbus_method("FilesystemUnmount",
-                                dbus_interface="org.freedesktop.UDisks.Device")
+#udisk = sysbus.get_object("org.freedesktop.UDisks",
+                          #"/org/freedesktop/UDisks/devices/%s" % devname)
+#mount = udisk.get_dbus_method("FilesystemMount",
+                              #dbus_interface="org.freedesktop.UDisks.Device")
+#unmount = udisk.get_dbus_method("FilesystemUnmount",
+                                #dbus_interface="org.freedesktop.UDisks.Device")
 
 # The line below tests notification mechanism before doing any mounting.
 # If we fail here, at least the device will not be touched.
