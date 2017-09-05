@@ -31,7 +31,8 @@
 from __future__ import print_function
 
 import sys
-import datetime
+from datetime import datetime
+import time
 import os, stat
 from subprocess import call as call
 
@@ -154,7 +155,7 @@ def detect_sesion_bus():
     
 ### Configuration
 configfilename = '~/.stravacli'
-size_threshold = 1*1024
+size_threshold = 1024
 
 ### Main code
 
@@ -166,8 +167,8 @@ size_threshold = 1*1024
 # TODO Make the script work even in absence of X display.
 if not os.environ.has_key("DISPLAY"):
     os.environ['DISPLAY'] = ":0"
-if not os.environ.has_key("DBUS_SESSION_BUS_ADDRESS"):
-    os.environ['DBUS_SESSION_BUS_ADDRESS'] = detect_sesion_bus()
+#if not os.environ.has_key("DBUS_SESSION_BUS_ADDRESS"):
+    #os.environ['DBUS_SESSION_BUS_ADDRESS'] = detect_sesion_bus()
 
 #sysbus = dbus.SystemBus()
 #bus = dbus.SessionBus()
@@ -176,7 +177,7 @@ devname = '/dev/null'
 try: mountpoint = sys.argv[1]
 except: usage()
 
-print("Started: " + datetime.datetime.today().strftime("%s") + " " + devname)
+print("Started: " + datetime.today().strftime("%s") + " " + devname)
 
 # If required, extract the last part of the device name, "/dev/sdb" -> "sdb"
 devname = devname.split("/")[-1]
@@ -202,7 +203,7 @@ devname = devname.split("/")[-1]
 cp = ConfigParser.ConfigParser()
 cp.read(os.path.expanduser(configfilename))
 if cp.has_section('UPLOAD') and 'last_time' in cp.options('UPLOAD'):
-    last_time = int(cp.get('UPLOAD', 'last_time'))
+    last_time = int(float(cp.get('UPLOAD', 'last_time')))
 else: last_time = 0
 
 # Root directory where GPX files are placed on Garmin devices
@@ -234,7 +235,7 @@ elif not upload_list:
     popup("No new activities uploaded")
 else:
     # Record the last sync time to prevent submission of duplicates next time
-    last_time = datetime.datetime.today().strftime("%s")
+    last_time = time.time()
     if not cp.has_section('UPLOAD'):
         cp.add_section('UPLOAD')
     cp.set('UPLOAD', 'last_time', last_time)
