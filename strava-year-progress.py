@@ -56,26 +56,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num
 
+meters_per_mile = 1609.34
 
-fig, ax = plt.subplots()
 for year in sorted(years.keys()):
     origin = datetime.datetime(year, 1, 1)
-    days_of_year = [(dt.replace(tzinfo=None) - origin).total_seconds() for dt in years[year]['datetime']]
+    days_of_year = np.array([(dt.replace(tzinfo=None) - origin).total_seconds() for dt in years[year]['datetime']])/60/60/24
     plt.plot(
             days_of_year,
-            np.cumsum(years[year]['distance']),
+            np.cumsum(years[year]['distance'])/meters_per_mile,
             label='%d' % year
             )
-labels = ax.get_xticklabels()
-plt.setp(labels, rotation=45)
+plt.xlim(0, 366)
+plt.xlabel('Days of the Year')
+plt.ylabel('Cumulative Miles')
 plt.legend(loc='best')
 plt.show()
-
-import pdb; pdb.set_trace()
-
-curves = {}
-for year, activities in years.items():
-    #years[year] = sorted(years[year], key=lambda t: t[0])
-    curves[year] = np.zeros((len(activities), 2))
-    #curves[year][:, 0] = 
-
