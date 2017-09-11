@@ -57,6 +57,7 @@ import matplotlib.pyplot as plt
 from matplotlib.dates import date2num
 
 meters_per_mile = 1609.34
+athlete = client.get_athlete()
 
 for year in sorted(years.keys()):
     origin = datetime.datetime(year, 1, 1)
@@ -69,5 +70,6 @@ for year in sorted(years.keys()):
 plt.xlim(0, 366)
 plt.xlabel('Days of the Year')
 plt.ylabel('Cumulative Miles')
+plt.title('Annual Distance for %s %s (%d)' % (athlete.firstname, athlete.lastname, athlete.id))
 plt.legend(loc='best')
 plt.show()
