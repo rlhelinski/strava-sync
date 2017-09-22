@@ -48,7 +48,8 @@ for activity in client.get_activities(
                 }
 
     years[activity.start_date.year]['datetime'].append(activity.start_date)
-    years[activity.start_date.year]['distance'].append(activity.distance)
+    years[activity.start_date.year]['distance'].append(
+            unithelper.miles(activity.distance).num)
 
 # Sort each year's activities
 # Create parametric vectors for each year
@@ -56,17 +57,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num
 
-meters_per_mile = 1609.34
 athlete = client.get_athlete()
 
 for year in sorted(years.keys()):
     origin = datetime.datetime(year, 1, 1)
     days_of_year = np.array([(dt.replace(tzinfo=None) - origin).total_seconds() for dt in years[year]['datetime']])/60/60/24
-    plt.plot(
-            days_of_year,
-            np.cumsum(years[year]['distance'])/meters_per_mile,
-            label='%d' % year
-            )
+    distances = np.cumsum(years[year]['distance'])
+    plt.plot(days_of_year, distances, label='%d' % year)
+
 plt.xlim(0, 366)
 plt.xlabel('Days of the Year')
 plt.ylabel('Cumulative Miles')
