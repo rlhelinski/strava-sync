@@ -59,11 +59,25 @@ from matplotlib.dates import date2num
 
 athlete = client.get_athlete()
 
+# also convert to JSON for external prototyping
+json_obj = {
+        'date': datetime.datetime.now().ctime(),
+        'years': {},
+        'athelete': {
+            'id': athlete.id,
+            'lastname': athlete.lastname,
+            'firstname': athlete.firstname
+            },
+        }
+
 for year in sorted(years.keys()):
     origin = datetime.datetime(year, 1, 1)
     days_of_year = np.array([(dt.replace(tzinfo=None) - origin).total_seconds() for dt in years[year]['datetime']])/60/60/24
     distances = np.cumsum(years[year]['distance'])
     plt.plot(days_of_year, distances, label='%d' % year)
+    json_obj['years'][year] = {}
+    json_obj['years'][year]['days'] = days_of_year.tolist()
+    json_obj['years'][year]['distances'] = distances.tolist()
 
 plt.xlim(0, 366)
 plt.xlabel('Days of the Year')
@@ -71,3 +85,8 @@ plt.ylabel('Cumulative Miles')
 plt.title('Annual Distance for %s %s (%d)' % (athlete.firstname, athlete.lastname, athlete.id))
 plt.legend(loc='best')
 plt.show()
+
+import json
+fp = open('data.json', 'w')
+json.dump(json_obj, fp)
+fp.close()
