@@ -20,6 +20,9 @@ try:
 except ImportError:
     import xml.etree.ElementTree as etree
 
+def secs_to_days(secs):
+    return secs/60/60/24
+
 ### Configuration
 configfilename = '~/.stravacli'
 
@@ -73,7 +76,7 @@ json_obj = {
 max_cumul_dist = 0
 for year in sorted(years.keys()):
     origin = datetime.datetime(year, 1, 1)
-    days_of_year = np.array([(dt.replace(tzinfo=None) - origin).total_seconds() for dt in years[year]['datetime']])/60/60/24
+    days_of_year = secs_to_days(np.array([(dt.replace(tzinfo=None) - origin).total_seconds() for dt in years[year]['datetime']]))
     distances = np.cumsum(years[year]['distance'])
     max_cumul_dist = max(max_cumul_dist, distances[-1])
     plt.plot(days_of_year, distances, label='%d' % year)
@@ -88,7 +91,7 @@ plt.title('Annual Distance for %s %s (%d)' % (athlete.firstname, athlete.lastnam
 plt.legend(loc='best')
 # make vertical lines for each month
 for mi in range(1, 13):
-    plt.axvline((datetime.datetime(2017, mi, 1) - origin).total_seconds()/60/60/24, c='gray', ls='dotted')
+    plt.axvline(secs_to_days((datetime.datetime(2017, mi, 1) - origin).total_seconds()), c='gray', ls='dotted')
 # make horizontal lines for each 1,000 miles
 for ti in range(1, int(max_cumul_dist/1000)+1):
     plt.axhline(ti*1000, c='gray', ls='dotted')
