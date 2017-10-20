@@ -54,6 +54,9 @@ for activity in client.get_activities(
     years[activity.start_date.year]['distance'].append(
             unithelper.miles(activity.distance).num)
 
+    if activity.flagged:
+        print ('Activity %d is flagged' % activity.id)
+
 # Sort each year's activities
 # Create parametric vectors for each year
 import numpy as np
