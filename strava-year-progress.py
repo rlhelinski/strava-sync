@@ -99,5 +99,5 @@ plt.show()
 
 import json
 fp = open('data.json', 'w')
-json.dump(json_obj, fp)
+json.dump(json_obj, fp, sort_keys=True, indent=4, separators=(', ', ': '))
 fp.close()
