@@ -32,22 +32,33 @@ except:
 client = Client(cat)
 
 activity_id = 1301160092
-types = ['time', 'cadence', 'watts', 'heartrate']
+types = ['time', 'cadence', 'watts', 'heartrate', 'grade_smooth', 'velocity_smooth']
 
 activity = client.get_activity(activity_id)
 
 streams = client.get_activity_streams(
         activity_id, types=types, resolution='high')
 
+grade = np.array(streams['grade_smooth'].data)
+cadence = np.array(streams['cadence'].data)
+watts = np.array(streams['watts'].data)
+heartrate = np.array(streams['heartrate'].data)
+velocity = np.array(streams['velocity_smooth'].data)
+
 plt.figure()
-plt.plot(streams['cadence'].data, streams['watts'].data, '.')
+plt.scatter(cadence, watts, c=grade, cmap='cool')
 plt.xlabel('Cadence (RPM)')
 plt.ylabel('Power (Watts)')
 
 plt.figure()
-plt.plot(streams['watts'].data, streams['heartrate'].data, '.')
+plt.scatter(watts, heartrate, c=grade, cmap='cool')
 plt.xlabel('Power (Watts)')
 plt.ylabel('Heart Rate (BPM)')
+
+plt.figure()
+plt.scatter(velocity, cadence, c=grade, cmap='cool')
+plt.xlabel('Velocity (m/s)')
+plt.ylabel('Cadence (RPM)')
 
 plt.show()
 
