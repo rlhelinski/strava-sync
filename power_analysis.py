@@ -49,16 +49,36 @@ plt.figure()
 plt.scatter(cadence, watts, c=grade, cmap='cool')
 plt.xlabel('Cadence (RPM)')
 plt.ylabel('Power (Watts)')
+plt.colorbar(label='Grade (%)')
+plt.autoscale(True, 'both', True)
 
 plt.figure()
 plt.scatter(watts, heartrate, c=grade, cmap='cool')
 plt.xlabel('Power (Watts)')
 plt.ylabel('Heart Rate (BPM)')
+plt.colorbar(label='Grade (%)')
+plt.autoscale(True, 'both', True)
 
 plt.figure()
 plt.scatter(velocity, cadence, c=grade, cmap='cool')
 plt.xlabel('Velocity (m/s)')
 plt.ylabel('Cadence (RPM)')
+plt.colorbar(label='Grade (%)')
+plt.autoscale(True, 'both', True)
+
+from matplotlib.colors import LogNorm
+
+plt.figure()
+plt.hist2d(cadence, watts, bins=40, norm=LogNorm(), cmap='cool')
+plt.xlabel('Cadence (RPM)')
+plt.ylabel('Power (Watts)')
+plt.colorbar(label='Frequency')
+
+plt.figure()
+plt.hist2d(watts, heartrate, bins=40, norm=LogNorm(), cmap='cool')
+plt.xlabel('Power (Watts)')
+plt.ylabel('Heart Rate (BPM)')
+plt.colorbar(label='Frequency')
 
 plt.show()
 
