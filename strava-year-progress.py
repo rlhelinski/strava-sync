@@ -86,6 +86,7 @@ for year in sorted(years.keys()):
     json_obj['years'][year] = {}
     json_obj['years'][year]['days'] = days_of_year.tolist()
     json_obj['years'][year]['distances'] = distances.tolist()
+    print ('Year %d total distance: %.2f miles' % (year, distances[-1]))
 
 plt.xlim(0, 366)
 plt.xlabel('Days of the Year')
