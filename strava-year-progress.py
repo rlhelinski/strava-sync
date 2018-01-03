@@ -37,7 +37,8 @@ client = Client(cat)
 
 years = {}
 
-origin_year = datetime.datetime.now().year-3
+last_n_years = 5
+origin_year = datetime.datetime.now().year-last_n_years
 
 for activity in client.get_activities(
         after='%d-01-01T00:00:00Z' % origin_year
